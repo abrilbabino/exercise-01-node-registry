@@ -1,21 +1,6 @@
 # TODO: Write a production-ready Dockerfile
-#
-# All of these are tested by the grader:
-#
-# [ ] Multi-stage build (2+ FROM instructions)
-# [ ] Base image: python:3.14-slim (pinned version, no :latest)
-# [ ] Copy requirements.txt and pip install BEFORE copying source code (layer caching)
-# [ ] Run as a non-root USER
-# [ ] EXPOSE 8080
-# [ ] HEALTHCHECK instruction
-# [ ] No hardcoded secrets (no ENV PASSWORD=..., no ENV SECRET_KEY=...)
-# [ ] Final image under 200MB
-#
-# Start command: uvicorn src.app:app --host 0.0.0.0 --port 8080
 
-# ==========================================
 # Stage 1: Builder (Dependency installation)
-# ==========================================
 FROM python:3.14-slim AS builder
 
 WORKDIR /app
@@ -25,9 +10,7 @@ COPY requirements.txt .
 # Install dependencies into a local user directory to keep the final image clean
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# ==========================================
 # Stage 2: Final Image (Production stage)
-# ==========================================
 FROM python:3.14-slim
 
 ENV PATH=/home/appuser/.local/bin:$PATH
