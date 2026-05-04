@@ -6,3 +6,40 @@
 # - api exposes port 8080 on the host
 # - Use environment variables from .env for DB credentials
 # - Do NOT hardcode passwords in this file
+
+services:
+  db:
+    # Requirement: PostgreSQL (postgres:17-alpine)
+    image: postgres:17-alpine
+    restart: always
+    # Requirement: Use environment variables from .env for DB credentials
+    # Requirement: Do NOT hardcode passwords in this file
+    env_file:
+      - .env
+    # Required for: Data persists across requests
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    # Requirement: your Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Requirement: api exposes port 8080 on the host
+    ports:
+      - "8080:8080"
+    # Requirement: depends on db
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+# Declare the persistent volume
+volumes:
+  postgres_data:
